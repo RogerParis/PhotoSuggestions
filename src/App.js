@@ -24,6 +24,21 @@ const App = () => {
       .then(() => console.log('User signed out!'));
   };
 
+  const onPressAnonymousLogin = () => {
+    auth()
+      .signInAnonymously()
+      .then(() => {
+        console.log('User signed in anonymously');
+      })
+      .catch((error) => {
+        if (error.code === 'auth/operation-not-allowed') {
+          console.log('Enable anonymous in your firebase console.');
+        }
+
+        console.error(error);
+      });
+  };
+
   if (initializing) {
     return null;
   }
@@ -31,14 +46,15 @@ const App = () => {
   if (!user) {
     return (
       <SafeAreaView style={styles.container}>
-        <Text>Login</Text>
+        <Text>Login Screen</Text>
+        <Button title={'LOGIN ANONYMOUSLY'} onPress={onPressAnonymousLogin} />
       </SafeAreaView>
     );
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Welcome {user.email}</Text>
+      <Text>Welcome {user.email || 'Anonymous'}</Text>
       <Button title={'LOGOUT'} onPress={onPressLogout} />
     </SafeAreaView>
   );
