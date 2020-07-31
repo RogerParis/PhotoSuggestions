@@ -1,6 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import {StyleSheet, View, Text, SafeAreaView, Button} from 'react-native';
 import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
 const App = () => {
   const [initializing, setInitializing] = useState(true);
@@ -27,8 +28,8 @@ const App = () => {
   const onPressAnonymousLogin = () => {
     auth()
       .signInAnonymously()
-      .then(() => {
-        console.log('User signed in anonymously');
+      .then((signedInUser) => {
+        console.log('User signed in anonymously signedInUser: ', signedInUser);
       })
       .catch((error) => {
         if (error.code === 'auth/operation-not-allowed') {
@@ -37,6 +38,11 @@ const App = () => {
 
         console.error(error);
       });
+  };
+
+  const onPressGetUsers = async () => {
+    const users = await firestore().collection('Users').get();
+    console.log('USERS: ', users);
   };
 
   if (initializing) {
@@ -48,6 +54,7 @@ const App = () => {
       <SafeAreaView style={styles.container}>
         <Text>Login Screen</Text>
         <Button title={'LOGIN ANONYMOUSLY'} onPress={onPressAnonymousLogin} />
+        <Button title={'GET USERS'} onPress={onPressGetUsers} />
       </SafeAreaView>
     );
   }
@@ -56,6 +63,7 @@ const App = () => {
     <SafeAreaView style={styles.container}>
       <Text>Welcome {user.email || 'Anonymous'}</Text>
       <Button title={'LOGOUT'} onPress={onPressLogout} />
+      <Button title={'GET USERS'} onPress={onPressGetUsers} />
     </SafeAreaView>
   );
 };
