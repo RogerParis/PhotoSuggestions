@@ -30,6 +30,17 @@ const App = () => {
       .signInAnonymously()
       .then((signedInUser) => {
         console.log('User signed in anonymously signedInUser: ', signedInUser);
+        firestore()
+          .collection('Users')
+          .doc(signedInUser.user.uid)
+          .set({
+            name: 'Roger',
+            surname: 'Paris',
+            age: 34,
+          })
+          .then(() => {
+            console.log('User added!');
+          });
       })
       .catch((error) => {
         if (error.code === 'auth/operation-not-allowed') {
@@ -40,9 +51,21 @@ const App = () => {
       });
   };
 
-  const onPressGetUsers = async () => {
-    const users = await firestore().collection('Users').get();
-    console.log('USERS: ', users);
+  const onPressGetUsers = () => {
+    firestore()
+      .collection('Users')
+      .get()
+      .then((querySnapshot) => {
+        console.log('Total users: ', querySnapshot.size);
+
+        querySnapshot.forEach((documentSnapshot) => {
+          console.log(
+            'User ID: ',
+            documentSnapshot.id,
+            documentSnapshot.data(),
+          );
+        });
+      });
   };
 
   if (initializing) {
